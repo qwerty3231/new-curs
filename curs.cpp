@@ -25,8 +25,13 @@ void mercanie()   //Штука убирающая мерцание курсора
     cci.bVisible = false;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cci);
 }
+// Настройки змейки	
+	const int xtabl = 46;  // Ширина поля (max=119, !!! (xtabl%2=0) default 118) 
+	const int ytabl = 29;  // Высота поля (max =29, default 29)
+	const int maxl = xtabl*ytabl/2;  //Макситмальная длина змейки 
 
-#define gWINDOW "mode con cols=65 lines=29"
+#define WINDOW "mode con cols=47 lines=31"  //Размер окна (xtabl+1, ytabl+2)
+#define gWINDOW "mode con cols=65 lines=29" 
 
 
 //Объявление позиций (menu config)
@@ -106,9 +111,118 @@ void Gmenu()  //Прорисовка пунктов меню
 	gotoxy(oX+(k/2),oY+3);
 	puts(ext);		
 }
-
+int spd()  //Уровень сложности
+{
+	int speed;
+	spd:;
+	system("cls");
+	gotoxy(xtabl/2-8,14);	
+	printf("Select lvl (1-10) ");
+	gotoxy(xtabl/2,ytabl/2+2);
+	scanf("%d",&speed);
+	if ((speed>=1)&&(speed<=10)) speed = 325-(speed*25); else {
+		system("cls");
+		gotoxy(xtabl/2-3,ytabl/2);
+		printf("ERROR!");
+		getch();
+		goto spd;
+	} //
+	return(speed);
+	
+}
 void pun1() 
 {    
+    system (WINDOW);
+	char c1,c;
+	int x[maxl],y[maxl],i,rdx,rdy,l,mx,my,speed,boolean;
+	srand(time(NULL));
+	c='d';
+	boolean=1;
+	rdx=1;
+    rdy=14;
+	i=0; x[0]=1; y[0]=14;	
+	speed=spd();	
+	system("cls");
+	gotoxy(xtabl/2-6,14);
+	printf("Press any key ");
+	getch();
+    system("cls"); 		  
+	while (true) {    //Начало игры
+
+
+	if ((rdx==x[0]) && (rdy==y[0])) {
+		i++;
+		x[i]=x[0];
+		y[i]=y[0];
+		
+		rd:;
+		rdx=(((rand()+rand()+rand())/3)%(xtabl-2)/2*2)+1;
+    	rdy=(((rand()+rand()+rand())/3)%(ytabl-2))+1;
+		for (l=0;l!=i;l++) {
+			if ((rdx==x[l])&&(rdy==y[l])) goto rd;
+		}
+	} 
+	
+	gotoxy(rdx,rdy);
+	printf("O");
+	
+
+	l=i;
+	while (l>0){
+		gotoxy(x[l],y[l]);
+		printf("#");
+		l--;
+	}
+
+	if (c=='w') gotoxy(x[0],y[0]),printf("A");
+	if (c=='s') gotoxy(x[0],y[0]),printf("V");
+	if (c=='a') gotoxy(x[0],y[0]),printf("<");
+	if (c=='d') gotoxy(x[0],y[0]),printf(">");
+
+	l=i+1;
+	while (l!=0) {
+		x[l]=x[l-1];
+		y[l]=y[l-1];		
+		l--;
+	}
+
+
+	Sleep(speed/2);
+	if (kbhit()!=0) c1=getch(),Sleep(speed/2); else Sleep(speed/2);
+	if ((c1=='w')&&(c=='s') || (c1=='s')&&(c=='w') || (c1=='a')&&(c=='d') || (c1=='d')&&(c=='a'))
+	{;} else {
+		if ((c1=='w')||(c1=='s')||(c1=='a')||(c1=='d')) c=c1;
+	}	
+	if (c=='w') y[0]--;
+	if (c=='s') y[0]++;
+	if (c=='a') x[0]-=2; 
+	if (c=='d') x[0]+=2;
+	if (c1=='p') {
+		Sleep(200);
+		c1=getch();
+	}
+	
+	
+	if ((x[0]==(xtabl+1))||(x[0]==-1)||(y[0]==0)||(y[0])==ytabl) boolean=0;	
+	l=i;
+	while (l>0){
+		if ((x[l]==x[0]) && (y[0]==y[l])) boolean=0;
+		l--;
+	}
+	if (boolean==0) {
+		gotoxy(xtabl/2-4,ytabl/2);
+		printf("Game Over");
+		getch();
+	return;
+	}
+	
+	gotoxy(x[1],y[1]);     
+	printf("#");
+	gotoxy(x[i+1],y[i+1]);
+	printf(" ");
+	
+    }
+	
 }
 void pun2()
 {	
