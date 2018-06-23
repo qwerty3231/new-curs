@@ -25,6 +25,7 @@ void mercanie()   //Штука убирающая мерцание курсора
     cci.bVisible = false;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cci);
 }
+
 // Настройки змейки	
 	const int xtabl = 46;  // Ширина поля (max=119, !!! (xtabl%2=0) default 118) 
 	const int ytabl = 29;  // Высота поля (max =29, default 29)
@@ -32,7 +33,6 @@ void mercanie()   //Штука убирающая мерцание курсора
 
 #define WINDOW "mode con cols=47 lines=31"  //Размер окна (xtabl+1, ytabl+2)
 #define gWINDOW "mode con cols=65 lines=29" 
-
 
 //Объявление позиций (menu config)
 	const char pOne[] = "New Game";
@@ -44,6 +44,9 @@ void mercanie()   //Штука убирающая мерцание курсора
 	
 	const int oX = xsizeglob/2-4; //позиция Gmenu по оси X 
 	const int oY = 19; //Позиция Gmenu ро оси Y
+	
+	const int l = 8; //Ширина чувствительности пунктов
+
 
 
 void printsnake(int x,int y){
@@ -97,6 +100,32 @@ void printsnake(int x,int y){
 }
 
 
+
+void ramki()   // Прорисовка рамок в игре
+{
+	int i;
+	gotoxy(0,0);
+	printf("\xc9");
+	for (i=1;i!=xtabl;i++){
+		printf("\xcd");
+	}
+	printf("\xbb\n");
+	for(i=1;i!=ytabl;i++){
+		printf("\xba");
+		gotoxy(xtabl,i);
+		printf("\xba\n");
+	}
+	printf("\xc8");
+		for (i=1;i!=xtabl;i++){
+		printf("\xcd");
+	}
+	printf("\xbc");
+	gotoxy(2,30);
+	printf("Length: ");
+	gotoxy(37,30);
+	printf("lvl:");
+}
+
 void Gmenu()  //Прорисовка пунктов меню
 {
 	int k;
@@ -111,6 +140,7 @@ void Gmenu()  //Прорисовка пунктов меню
 	gotoxy(oX+(k/2),oY+3);
 	puts(ext);		
 }
+
 int spd()  //Уровень сложности
 {
 	int speed;
@@ -130,6 +160,18 @@ int spd()  //Уровень сложности
 	return(speed);
 	
 }
+
+void gameover(int speed, int i){
+			gotoxy(xtabl/2-4,ytabl/2);
+			printf("Game Over");
+			gotoxy(xtabl/2-7,ytabl/2+1);
+			printf("Your Scrore: %d",((10000/speed)*i));
+			Sleep(500);
+			getch();
+			system("cls");
+			return;	
+}
+
 void pun1() 
 {    
     system (WINDOW);
@@ -146,7 +188,8 @@ void pun1()
 	gotoxy(xtabl/2-6,14);
 	printf("Press any key ");
 	getch();
-    system("cls"); 		  
+    system("cls"); 	
+    ramki();	  
 	while (true) {    //Начало игры
 
 
@@ -210,9 +253,7 @@ void pun1()
 		l--;
 	}
 	if (boolean==0) {
-		gotoxy(xtabl/2-4,ytabl/2);
-		printf("Game Over");
-		getch();
+	gameover(speed,i);
 	return;
 	}
 	
@@ -221,11 +262,24 @@ void pun1()
 	gotoxy(x[i+1],y[i+1]);
 	printf(" ");
 	
-    }
 	
+    gotoxy(10,30);         //Вывод длины змейки
+	printf("%d",i+1);
+	gotoxy(42,30);              //Вывод уровня 
+	printf("%d",(325-speed)/25);	
+	
+    }
+
+			
 }
 void pun2()
-{	
+{
+	
+	system("cls");
+	ramki();
+	getch();
+	system("cls");
+	
 }
 
 
@@ -239,6 +293,9 @@ void ss(int x, int c)
 		printf("<-");
 	    if (c==13) {
 	    	pun1();
+	    	system (gWINDOW);
+	    	printsnake(1,3);
+			Gmenu();
 		}
 	} else {
 		gotoxy((oX-2),(oY-3));
@@ -287,13 +344,20 @@ void ss(int x, int c)
 
 int main()
 { 	
+	int xsize = GetSystemMetrics(SM_CXSCREEN); 
+	int ysize = GetSystemMetrics(SM_CYSCREEN);
+	
+
+	
 	system (gWINDOW);
+	system("title SNAKE");
+	mercanie();
+
+	   
 	char c; int x,ic;
     x=0;
     Gmenu();
-	system("title SNAKE");
-	mercanie();
-    printsnake(1,3);
+	printsnake(1,3);
 	while (true){
 
 	ss(ic,c);
