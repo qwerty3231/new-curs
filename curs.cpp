@@ -33,6 +33,55 @@ void gotoxy(int xpos, int ypos)
 	const int oY = 19; //Позиция Gmenu ро оси Y
 
 
+void printsnake(int x,int y){
+							 gotoxy(x,y);
+	printf(" xXXXXx");  	 gotoxy(x,y+1);
+	printf("XX    XX");	     gotoxy(x,y+2);
+	printf(" XXx");	         gotoxy(x,y+3);
+	printf("  xXXx");	     gotoxy(x,y+4);
+	printf("    xXX");	     gotoxy(x,y+5);
+	printf("XX    XX");  	 gotoxy(x,y+6);
+	printf(" xXXXXx");
+	
+	
+							 gotoxy(x+13,y);
+	printf("XXx     XX"); 	 gotoxy(x+13,y+1);
+	printf("XXXX    XX");	 gotoxy(x+13,y+2);
+	printf("XX XX   XX"); 	 gotoxy(x+13,y+3);
+	printf("XX  XX  XX");  	 gotoxy(x+13,y+4);
+	printf("XX   XX XX");    gotoxy(x+13,y+5);
+	printf("XX    XXXX");    gotoxy(x+13,y+6);
+	printf("XX     xXX");
+	
+	
+						     gotoxy(x+28,y);
+	printf("   XXXXX");      gotoxy(x+28,y+1);
+    printf("  xX   Xx");     gotoxy(x+28,y+2);
+	printf("  Xx   xX");     gotoxy(x+28,y+3);
+    printf(" xX     Xx");    gotoxy(x+28,y+4);
+    printf(" XXXXXXXXX");    gotoxy(x+28,y+5);
+    printf("xX       Xx");   gotoxy(x+28,y+6);
+    printf("Xx       xX");
+    
+   							 gotoxy(x+44,y);
+    printf("XX   XX");    	 gotoxy(x+44,y+1);
+    printf("XX  XX");    	 gotoxy(x+44,y+2);
+    printf("XX XX");    	 gotoxy(x+44,y+3);
+    printf("XXXX");    		 gotoxy(x+44,y+4);
+    printf("XX XX");		 gotoxy(x+44,y+5);
+	printf("XX  XX");   	 gotoxy(x+44,y+6);
+    printf("XX   XX");
+    
+    
+    						 gotoxy(x+56,y);
+    printf("XXXXXXX");  	 gotoxy(x+56,y+1);
+    printf("XX");       	 gotoxy(x+56,y+2);
+    printf("XX");       	 gotoxy(x+56,y+3);
+    printf("XXXXX");    	 gotoxy(x+56,y+4);
+    printf("XX");       	 gotoxy(x+56,y+5);
+    printf("XX");       	 gotoxy(x+56,y+6);
+    printf("XXXXXXX");
+}
 
 
 void Gmenu()  //Прорисовка пунктов меню
@@ -120,6 +169,7 @@ int main()
 	char c; int x,ic;
     x=0;
     Gmenu();
+    printsnake(1,3);
 	while (true){
 
 	ss(ic,c);
