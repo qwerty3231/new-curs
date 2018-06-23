@@ -18,6 +18,14 @@ void gotoxy(int xpos, int ypos)
   SetConsoleCursorPosition(hOuput,scrn);
 }
 
+void mercanie()   //Штука убирающая мерцание курсора
+{ 
+	CONSOLE_CURSOR_INFO cci; 
+    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cci);
+    cci.bVisible = false;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cci);
+}
+
 #define gWINDOW "mode con cols=65 lines=29"
 
 
@@ -169,6 +177,8 @@ int main()
 	char c; int x,ic;
     x=0;
     Gmenu();
+	system("title SNAKE");
+	mercanie();
     printsnake(1,3);
 	while (true){
 
