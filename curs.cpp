@@ -1,180 +1,167 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h> 
-#include <conio.h>  
-#include <Windows.h>
 #include <string.h>
 #include <time.h>
-
-
-void gotoxy(int xpos, int ypos)
+#include <unistd.h>
+#include <conio.h>
+#include <ncurses.h>
+void gotox(int x,int y)
 {
-  COORD scrn;    
- 
-  HANDLE hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
- 
-  scrn.X = xpos; scrn.Y = ypos;
- 
-  SetConsoleCursorPosition(hOuput,scrn);
-}
+printf("%c[%d;%df",0x1B,y,x);
+} 
 
-void mercanie()   //Штука убирающая мерцание курсора
-{ 
-	CONSOLE_CURSOR_INFO cci; 
-    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cci);
-    cci.bVisible = false;
-    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cci);
-}
+	
+	#define xtabl 30  // ГГЁГ°ГЁГ­Г  ГЇГ®Г«Гї (max=119, !!! (xtabl%2=0) default 118) 
+	#define ytabl 20  // Г‚Г»Г±Г®ГІГ  ГЇГ®Г«Гї (max =29, default 29)
+	const int maxl = xtabl*ytabl/2;  //ГЊГ ГЄГ±ГЁГІГ¬Г Г«ГјГ­Г Гї Г¤Г«ГЁГ­Г  Г§Г¬ГҐГ©ГЄГЁ 
 
-// Настройки змейки	
-	const int xtabl = 46;  // Ширина поля (max=119, !!! (xtabl%2=0) default 118) 
-	const int ytabl = 29;  // Высота поля (max =29, default 29)
-	const int maxl = xtabl*ytabl/2;  //Макситмальная длина змейки 
+#define WINDOW "mode con cols=47 lines=31"  //ГђГ Г§Г¬ГҐГ° Г®ГЄГ­Г  (xtabl+1, ytabl+2)
 
-#define WINDOW "mode con cols=47 lines=31"  //Размер окна (xtabl+1, ytabl+2)
-#define gWINDOW "mode con cols=65 lines=29" 
 
-//Объявление позиций (menu config)
+//ГЋГЎГєГїГўГ«ГҐГ­ГЁГҐ ГЇГ®Г§ГЁГ¶ГЁГ© (menu config)
 	const char pOne[] = "New Game";
 	const char pTwo[] = "Test";
 	const char ext[] = "Exit";
 	
-	const int xsizeglob = 66;
-	const int ysizeglob = 29;
+	#define xsizeglob 66
+	#define ysizeglob 29
 	
-	const int oX = xsizeglob/2-4; //позиция Gmenu по оси X 
-	const int oY = 19; //Позиция Gmenu ро оси Y
+	const int oX = 29; //ГЇГ®Г§ГЁГ¶ГЁГї Gmenu ГЇГ® Г®Г±ГЁ X 
+	#define oY 19 //ГЏГ®Г§ГЁГ¶ГЁГї Gmenu Г°Г® Г®Г±ГЁ Y
 	
-	const int l = 8; //Ширина чувствительности пунктов
 
 
 
 void printsnake(int x,int y){
-							 gotoxy(x,y);
-	printf(" xXXXXx");  	 gotoxy(x,y+1);
-	printf("XX    XX");	     gotoxy(x,y+2);
-	printf(" XXx");	         gotoxy(x,y+3);
-	printf("  xXXx");	     gotoxy(x,y+4);
-	printf("    xXX");	     gotoxy(x,y+5);
-	printf("XX    XX");  	 gotoxy(x,y+6);
+							 gotox(x,y);
+	printf(" xXXXXx");  	 gotox(x,y+1);
+	printf("XX    XX");	     gotox(x,y+2);
+	printf(" XXx");	         gotox(x,y+3);
+	printf("  xXXx");	     gotox(x,y+4);
+	printf("    xXX");	     gotox(x,y+5);
+	printf("XX    XX");  	 gotox(x,y+6);
 	printf(" xXXXXx");
 	
 	
-							 gotoxy(x+13,y);
-	printf("XXx     XX"); 	 gotoxy(x+13,y+1);
-	printf("XXXX    XX");	 gotoxy(x+13,y+2);
-	printf("XX XX   XX"); 	 gotoxy(x+13,y+3);
-	printf("XX  XX  XX");  	 gotoxy(x+13,y+4);
-	printf("XX   XX XX");    gotoxy(x+13,y+5);
-	printf("XX    XXXX");    gotoxy(x+13,y+6);
+							 gotox(x+13,y);
+	printf("XXx     XX"); 	 gotox(x+13,y+1);
+	printf("XXXX    XX");	 gotox(x+13,y+2);
+	printf("XX XX   XX"); 	 gotox(x+13,y+3);
+	printf("XX  XX  XX");  	 gotox(x+13,y+4);
+	printf("XX   XX XX");    gotox(x+13,y+5);
+	printf("XX    XXXX");    gotox(x+13,y+6);
 	printf("XX     xXX");
 	
 	
-						     gotoxy(x+28,y);
-	printf("   XXXXX");      gotoxy(x+28,y+1);
-    printf("  xX   Xx");     gotoxy(x+28,y+2);
-	printf("  Xx   xX");     gotoxy(x+28,y+3);
-    printf(" xX     Xx");    gotoxy(x+28,y+4);
-    printf(" XXXXXXXXX");    gotoxy(x+28,y+5);
-    printf("xX       Xx");   gotoxy(x+28,y+6);
+						     gotox(x+28,y);
+	printf("   XXXXX");      gotox(x+28,y+1);
+    printf("  xX   Xx");     gotox(x+28,y+2);
+	printf("  Xx   xX");     gotox(x+28,y+3);
+    printf(" xX     Xx");    gotox(x+28,y+4);
+    printf(" XXXXXXXXX");    gotox(x+28,y+5);
+    printf("xX       Xx");   gotox(x+28,y+6);
     printf("Xx       xX");
     
-   							 gotoxy(x+44,y);
-    printf("XX   XX");    	 gotoxy(x+44,y+1);
-    printf("XX  XX");    	 gotoxy(x+44,y+2);
-    printf("XX XX");    	 gotoxy(x+44,y+3);
-    printf("XXXX");    		 gotoxy(x+44,y+4);
-    printf("XX XX");		 gotoxy(x+44,y+5);
-	printf("XX  XX");   	 gotoxy(x+44,y+6);
+   							 gotox(x+44,y);
+    printf("XX   XX");    	 gotox(x+44,y+1);
+    printf("XX  XX");    	 gotox(x+44,y+2);
+    printf("XX XX");    	 gotox(x+44,y+3);
+    printf("XXXX");    		 gotox(x+44,y+4);
+    printf("XX XX");		 gotox(x+44,y+5);
+	printf("XX  XX");   	 gotox(x+44,y+6);
     printf("XX   XX");
     
     
-    						 gotoxy(x+56,y);
-    printf("XXXXXXX");  	 gotoxy(x+56,y+1);
-    printf("XX");       	 gotoxy(x+56,y+2);
-    printf("XX");       	 gotoxy(x+56,y+3);
-    printf("XXXXX");    	 gotoxy(x+56,y+4);
-    printf("XX");       	 gotoxy(x+56,y+5);
-    printf("XX");       	 gotoxy(x+56,y+6);
+    						 gotox(x+56,y);
+    printf("XXXXXXX");  	 gotox(x+56,y+1);
+    printf("XX");       	 gotox(x+56,y+2);
+    printf("XX");       	 gotox(x+56,y+3);
+    printf("XXXXX");    	 gotox(x+56,y+4);
+    printf("XX");       	 gotox(x+56,y+5);
+    printf("XX");       	 gotox(x+56,y+6);
     printf("XXXXXXX");
 }
 
 
 
-void ramki()   // Прорисовка рамок в игре
+void ramki()
 {
 	int i;
-	gotoxy(0,0);
-	printf("\xc9");
+	system("clear");
+	gotox(0,0);
 	for (i=1;i!=xtabl;i++){
-		printf("\xcd");
+		printf("+");
 	}
-	printf("\xbb\n");
+	printf("+\n");
 	for(i=1;i!=ytabl;i++){
-		printf("\xba");
-		gotoxy(xtabl,i);
-		printf("\xba\n");
+		gotox(0,i);
+		printf("+");
+		gotox(xtabl,i);
+		printf("+");
 	}
-	printf("\xc8");
+	gotox(0,ytabl);
 		for (i=1;i!=xtabl;i++){
-		printf("\xcd");
+		printf("+");
 	}
-	printf("\xbc");
-	gotoxy(2,30);
-	printf("Length: ");
-	gotoxy(37,30);
-	printf("lvl:");
 }
 
-void Gmenu()  //Прорисовка пунктов меню
+void Gmenu(int xsizeglob,int ysizeglob)
 {
 	int k;
-	gotoxy(oX,oY-3);
+	gotox(oX,oY-3);
 	puts(pOne);
 
 	k=strlen(pOne)-strlen(pTwo);
-	gotoxy(oX+(k/2),oY);
+	gotox(oX+(k/2),oY);
 	puts(pTwo);
 	
 	k=strlen(pOne)-strlen(ext);
-	gotoxy(oX+(k/2),oY+3);
+	gotox(oX+(k/2),oY+3);
 	puts(ext);		
 }
 
-int spd()  //Уровень сложности
+int spd()
 {
 	int speed;
 	spd:;
-	system("cls");
-	gotoxy(xtabl/2-8,14);	
+	system("clear");
+	gotox(xtabl/2-8,14);	
 	printf("Select lvl (1-10) ");
-	gotoxy(xtabl/2,ytabl/2+2);
+	gotox(xtabl/2,ytabl/2+2);
 	scanf("%d",&speed);
 	if ((speed>=1)&&(speed<=10)) speed = 325-(speed*25); else {
-		system("cls");
-		gotoxy(xtabl/2-3,ytabl/2);
+		system("clear");
+		gotox(xtabl/2-3,ytabl/2);
 		printf("ERROR!");
-		getch();
+		getchar();
 		goto spd;
-	} //
+	} 
 	return(speed);
 	
 }
 
 void GameOver(int speed, int i){
-			gotoxy(xtabl/2-4,ytabl/2);
+			gotox(xtabl/2-4,ytabl/2);
 			printf("Game Over");
-			gotoxy(xtabl/2-7,ytabl/2+1);
+			gotox(xtabl/2-7,ytabl/2+1);
 			printf("Your Scrore: %d",((10000/speed)*i));
-			Sleep(500);
-			getch();
-			system("cls");
+			//sleep(500/1000);
+			sleep(1);
+			getchar();
+			system("clear");
 			return;	
+}
+
+char naprav(char Button){
+	if (Button=='w') return 'A';
+	if (Button=='s') return 'V';
+	if (Button=='a') return '<';
+	if (Button=='d') return '>';
 }
 
 void pun1() 
 {    
-    system (WINDOW);
     
     char Button,_Button;
 	int Speed;
@@ -197,13 +184,13 @@ void pun1()
 	Length=0;
 	Button = 'd';	
 	Speed=spd();	
-	system("cls");
-	gotoxy(xtabl/2-6,14);
+	system("clear");
+	gotox(xtabl/2-6,14);
 	printf("Press any key ");
-	getch();
-    system("cls"); 	
+	getchar();
+    system("clear"); 	
     ramki();	  
-	while (true) {    //Начало игры
+	while (1) {    //ГЌГ Г·Г Г«Г® ГЁГЈГ°Г»
 
 	
 	if ((FructPos.RdX==SnakePos[0].X)&&(FructPos.RdY==SnakePos[0].Y)){
@@ -218,16 +205,14 @@ void pun1()
 		}		
 	}
 	
-	gotoxy(FructPos.RdX,FructPos.RdY);
+	gotox(FructPos.RdX,FructPos.RdY);
 	printf("O");
 	
-	gotoxy(SnakePos[1].X,SnakePos[1].Y);
-	printf("#");
+	gotox(SnakePos[1].X,SnakePos[1].Y);
+	printf("@");
 
-	if (Button=='w') gotoxy(SnakePos[0].X,SnakePos[0].Y),printf("A");
-	if (Button=='s') gotoxy(SnakePos[0].X,SnakePos[0].Y),printf("V");
-	if (Button=='a') gotoxy(SnakePos[0].X,SnakePos[0].Y),printf("<");
-	if (Button=='d') gotoxy(SnakePos[0].X,SnakePos[0].Y),printf(">");
+	gotox(SnakePos[0].X,SnakePos[0].Y);
+	printf("%c",naprav(Button));
 
 	
 	for (int i=Length+1;i!=0;i--){
@@ -235,10 +220,12 @@ void pun1()
 		SnakePos[i].Y=SnakePos[i-1].Y;
 	}
 	
-	Sleep(Speed/2);
-	if (kbhit()!=0) _Button=getch();
-	Sleep(Speed/2);
-	if ((_Button=='w')&&(Button=='s') || (_Button=='s')&&(Button=='w') || (_Button=='a')&&(Button=='d') || (_Button=='d')&&(Button=='a')) {;} else {
+	//sleep(Speed/2000);
+	sleep(1);
+	if (kbhit()!=0) _Button=getchar();
+	//sleep(Speed/2000);
+	sleep(1);
+	if (((_Button=='w')&&(Button=='s')) || ((_Button=='s')&&(Button=='w')) || ((_Button=='a')&&(Button=='d')) || ((_Button=='d')&&(Button=='a'))){;} else {
 		if ((_Button=='a') || (_Button=='d') || (_Button=='w') || (_Button=='s'))
 			Button=_Button;
 	}
@@ -249,8 +236,9 @@ void pun1()
 	if (Button=='a') SnakePos[0].X-=2; 
 	if (Button=='d') SnakePos[0].X+=2;
 	if (Button=='p') {
-		Sleep(200);
-		Button=getch();
+		//sleep(200/1000);
+		sleep(1);
+		Button=getchar();
 	}
 	
 	
@@ -267,14 +255,8 @@ void pun1()
 		return;
 	}
 	
-	gotoxy(SnakePos[Length+1].X,SnakePos[Length+1].Y);
-	printf(" ");
-	
-	
-    gotoxy(10,30);         //Вывод длины змейки
-	printf("%d",Length+1);
-	gotoxy(42,30);              //Вывод уровня 
-	printf("%d",(325-Speed)/25);	
+	gotox(SnakePos[Length+1].X,SnakePos[Length+1].Y);
+	printf(" ");	
 	
     }
 
@@ -284,10 +266,10 @@ void pun1()
 void pun2()
 {
 	
-	system("cls");
+	system("clear");
 	ramki();
-	getch();
-	system("cls");
+	getchar();
+	system("clear");
 	
 }
 
@@ -296,56 +278,57 @@ void ss(int x, int c)
 {
 	int k;
 	if (x==0) {
-		gotoxy((oX-2),(oY-3));
+		gotox((oX-2),(oY-3));
 		printf("->");
-		gotoxy((strlen(pOne)+oX),(oY-3));
+		gotox((strlen(pOne)+oX),(oY-3));
 		printf("<-");
 	    if (c==13) {
+		system("clear");
 	    	pun1();
-	    	system (gWINDOW);
+		return;
 	    	printsnake(1,3);
-			Gmenu();
+			Gmenu(66,29);
 		}
 	} else {
-		gotoxy((oX-2),(oY-3));
+		gotox((oX-2),(oY-3));
 		printf("  ");
-		gotoxy((strlen(pOne)+oX),(oY-3));
+		gotox((strlen(pOne)+oX),(oY-3));
 		printf("  ");
 	}
 	
 	k=strlen(pOne)-strlen(pTwo);
 	if ((x==1)||(x==-2)) {
-		gotoxy((oX-2+(k/2)),(oY));
+		gotox((oX-2+(k/2)),(oY));
 		printf("->");
-		gotoxy((strlen(pTwo)+oX+(k/2)),(oY));
+		gotox((strlen(pTwo)+oX+(k/2)),(oY));
 		printf("<-");
 		if (c==13) pun2();
 	} else {
-		gotoxy((oX-2+(k/2)),(oY));
+		gotox((oX-2+(k/2)),(oY));
 		printf("  ");
-		gotoxy((strlen(pTwo)+oX+(k/2)),(oY));
+		gotox((strlen(pTwo)+oX+(k/2)),(oY));
 		printf("  ");
 	}
 	
 	k=strlen(pOne)-strlen(ext);
 	if ((x==2)||(x==-1)) {
-		gotoxy((oX-2+(k/2)),(oY+3));
+		gotox((oX-2+(k/2)),(oY+3));
 		printf("->");
-		gotoxy((strlen(ext)+oX+(k/2)),(oY+3));
+		gotox((strlen(ext)+oX+(k/2)),(oY+3));
 		printf("<-");
 		if (c==13) {
-			system("cls");
-			gotoxy(xsizeglob/2-2,14);
+			system("clear");
+			gotox(66/2-2,14);
 			printf("Bye!");
-			getch();
+			getchar();
 			exit(1);
 			
 		} 
 		
 	} else {
-		gotoxy((oX-2+(k/2)),(oY+3));
+		gotox((oX-2+(k/2)),(oY+3));
 		printf("  ");
-		gotoxy((strlen(ext)+oX+(k/2)),(oY+3));
+		gotox((strlen(ext)+oX+(k/2)),(oY+3));
 		printf("  ");
 		}
 }
@@ -353,24 +336,19 @@ void ss(int x, int c)
 
 int main()
 { 	
-	int xsize = GetSystemMetrics(SM_CXSCREEN); 
-	int ysize = GetSystemMetrics(SM_CYSCREEN);
 	
 
 	
-	system (gWINDOW);
-	system("title SNAKE");
-	mercanie();
 
 	   
 	char c; int x,ic;
     x=0;
-    Gmenu();
+    Gmenu(66,29);
 	printsnake(1,3);
-	while (true){
+	while (1){
 
 	ss(ic,c);
-	c=getch();
+	c=getchar();
 	if (c=='w') x--;
 	if (c=='s') x++;
 	ic=x%3;
@@ -379,3 +357,4 @@ int main()
 	
 }
 
+  
